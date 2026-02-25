@@ -48,7 +48,7 @@ Download from:
 
 https://ollama.com/download
 
-OR via Homebrew:
+OR via curl:
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
