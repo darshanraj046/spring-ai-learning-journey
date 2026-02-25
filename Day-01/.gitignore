@@ -1,0 +1,32 @@
+### Maven ###
+/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+### IDE ###
+.idea/
+*.iml
+*.iws
+*.ipr
+
+### VS Code ###
+.vscode/
+
+### Mac ###
+.DS_Store
+
+### Logs ###
+*.log
+
+### Environment files ###
+.env
+.env.*
+
+### Node ###
+node_modules/
+
+### Build ###
+/build/

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spring AI Chat</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #eef2f7, #dfe9f3);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #1f2937;
+            color: white;
+            padding: 15px 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f9fafb;
+        }
+
+        .chat-footer {
+            padding: 15px;
+            background: white;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .user .bubble {
+            background: #2563eb;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot .bubble {
+            background: #10b981;
+            color: white;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing {
+            font-style: italic;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card shadow chat-container">
+    <div class="chat-header">
+        Spring AI Chat
+    </div>
+
+    <div class="chat-body" id="chatBody"></div>
+
+    <div class="chat-footer">
+        <div class="input-group">
+            <input type="text" id="messageInput" class="form-control"
+                   placeholder="Type your message...">
+            <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const chatBody = document.getElementById("chatBody");
+    const input = document.getElementById("messageInput");
+
+    input.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") sendMessage();
+    });
+
+    async function sendMessage() {
+        const message = input.value.trim();
+        if (!message) return;
+
+        addMessage(message, "user");
+        input.value = "";
+
+        const typingElement = addMessage("Typing...", "bot", true);
+
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: message
+        });
+
+        const data = await response.text();
+
+        typingElement.remove();
+
+        const botBubble = addMessage("", "bot");
+        typeText(botBubble.querySelector(".bubble"), data);
+
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function addMessage(text, sender, isTyping = false) {
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message", sender);
+
+        const bubble = document.createElement("div");
+        bubble.classList.add("bubble");
+
+        if (isTyping) {
+            bubble.classList.add("typing");
+        }
+
+        bubble.innerText = text;
+
+        messageDiv.appendChild(bubble);
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        return messageDiv;
+    }
+
+    function typeText(element, text, speed = 15) {
+        let index = 0;
+        function typing() {
+            if (index < text.length) {
+                element.innerHTML += text.charAt(index);
+                index++;
+                chatBody.scrollTop = chatBody.scrollHeight;
+                setTimeout(typing, speed);
+            }
+        }
+        typing();
+    }
+
+</script>
+
+</body>
+</html>
